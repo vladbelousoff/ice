@@ -1,2 +1,2 @@
 include_directories(../include)
-add_executable(ice-test test.c)
+add_executable(test-lexer lexer.c)
