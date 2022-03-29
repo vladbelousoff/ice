@@ -16,24 +16,28 @@ typedef struct iceListEntryT {
 
 typedef struct iceListEntryT iceListHeadT;
 
-static void iceListInit(iceListHeadT* self)
+static void
+iceListInit(iceListHeadT* self)
 {
     self->prev = (iceListEntryT*)self;
     self->next = (iceListEntryT*)self;
 }
 
-static void iceListTerm(iceListHeadT* self)
+static void
+iceListTerm(iceListHeadT* self)
 {
     self->prev = (iceListEntryT*)0xdeadbeef;
     self->next = (iceListEntryT*)0xdeadbeef;
 }
 
-static int iceListIsEmpty(iceListHeadT* head)
+static int
+iceListIsEmpty(iceListHeadT* head)
 {
     return head->next == head;
 }
 
-static void iceListAddInternal(iceListEntryT* _new, iceListEntryT* prev, iceListEntryT* next)
+static void
+iceListAddInternal(iceListEntryT* _new, iceListEntryT* prev, iceListEntryT* next)
 {
     next->prev = _new;
     _new->next = next;
@@ -41,23 +45,27 @@ static void iceListAddInternal(iceListEntryT* _new, iceListEntryT* prev, iceList
     prev->next = _new;
 }
 
-static void iceListPushFront(iceListHeadT* head, iceListEntryT* entry)
+static void
+iceListPushFront(iceListHeadT* head, iceListEntryT* entry)
 {
     iceListAddInternal(entry, (iceListEntryT*)head, head->next);
 }
 
-static void iceListPushBack(iceListHeadT* head, iceListEntryT* entry)
+static void
+iceListPushBack(iceListHeadT* head, iceListEntryT* entry)
 {
     iceListAddInternal(entry, head->prev, (iceListEntryT*)head);
 }
 
-static void iceListRemoveInternal(iceListEntryT* prev, iceListEntryT* next)
+static void
+iceListRemoveInternal(iceListEntryT* prev, iceListEntryT* next)
 {
     next->prev = prev;
     prev->next = next;
 }
 
-static void iceListRemove(iceListEntryT* entry)
+static void
+iceListRemove(iceListEntryT* entry)
 {
     iceListRemoveInternal(entry->prev, entry->next);
 }

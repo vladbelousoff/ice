@@ -13,7 +13,8 @@ typedef struct iceLexerT {
 	iceListHeadT tokens;
 } iceLexerT;
 
-static void iceLexerInit(iceLexerT* self, const char source[])
+static void
+iceLexerInit(iceLexerT* self, const char source[])
 {
     iceListInit(&self->tokens);
 
@@ -23,7 +24,8 @@ static void iceLexerInit(iceLexerT* self, const char source[])
 	self->lPos = 0;
 }
 
-static void iceLexerTerm(iceLexerT* self)
+static void
+iceLexerTerm(iceLexerT* self)
 {
     iceListEntryT* entry;
     iceListEntryT* safe;
@@ -35,17 +37,20 @@ static void iceLexerTerm(iceLexerT* self)
     }
 }
 
-static char iceGetSymbol(iceLexerT* self)
+static char
+iceGetSymbol(iceLexerT* self)
 {
 	return self->source[self->sPos];
 }
 
-static int iceIsNewline(char symbol)
+static int
+iceIsNewline(char symbol)
 {
     return symbol == '\n';
 }
 
-static char iceEatSymbol(iceLexerT* self)
+static char
+iceEatSymbol(iceLexerT* self)
 {
     char symbol = self->source[self->sPos++];
     if (iceIsNewline(symbol)) {
@@ -68,32 +73,38 @@ typedef enum iceSymbolT {
     ICE_SYMBOL_SERVICE,
 } iceSymbolT;
 
-static int iceIsSpace(char symbol)
+static int
+iceIsSpace(char symbol)
 {
 	return symbol == ' ' || symbol == '\t' || symbol == '\r';
 }
 
-static int iceIsAlpha(char symbol)
+static int
+iceIsAlpha(char symbol)
 {
     return symbol >= 'A' && symbol <= 'z';
 }
 
-static int iceIsDigit(char symbol)
+static int
+iceIsDigit(char symbol)
 {
     return symbol >= '0' && symbol <= '9';
 }
 
-static int iceIsQuote(char symbol)
+static int
+iceIsQuote(char symbol)
 {
     return symbol == '\'';
 }
 
-static int iceIsServiceSymbol(char symbol)
+static int
+iceIsServiceSymbol(char symbol)
 {
     return iceFindSymbol("~!@#$%^&*()-+=", symbol) != -1;
 }
 
-static iceSymbolT iceGetSymbolType(char symbol)
+static iceSymbolT
+iceGetSymbolType(char symbol)
 {
     if (iceIsNewline(symbol))
         return ICE_SYMBOL_NEWLINE;
@@ -116,7 +127,8 @@ static iceSymbolT iceGetSymbolType(char symbol)
 	return ICE_SYMBOL_UNKNOWN;
 }
 
-static int iceLexerProcessDigit(iceLexerT* self)
+static int
+iceLexerProcessDigit(iceLexerT* self)
 {
     unsigned long bufPos = 0;
     unsigned long dotCnt = 0;
@@ -190,7 +202,8 @@ static int iceLexerProcessDigit(iceLexerT* self)
     return -1;
 }
 
-static int iceLexerProcessIdentifier(iceLexerT* self)
+static int
+iceLexerProcessIdentifier(iceLexerT* self)
 {
     unsigned long bufPos = 0;
 
@@ -234,7 +247,8 @@ static int iceLexerProcessIdentifier(iceLexerT* self)
     return -1;
 }
 
-static int iceLexerProcessString(iceLexerT* self)
+static int
+iceLexerProcessString(iceLexerT* self)
 {
     unsigned long bufPos = 0;
 
@@ -273,7 +287,8 @@ static int iceLexerProcessString(iceLexerT* self)
     return -1;
 }
 
-static int iceLexerProcessSymbol(iceLexerT* self)
+static int
+iceLexerProcessSymbol(iceLexerT* self)
 {
     iceSymbolT symbolType = iceGetSymbolType(iceGetSymbol(self));
     switch (symbolType) {
@@ -299,7 +314,8 @@ static int iceLexerProcessSymbol(iceLexerT* self)
     return 0;
 }
 
-static void iceLexerTokenize(iceLexerT* self)
+static void
+iceLexerTokenize(iceLexerT* self)
 {
 	while (iceGetSymbol(self) != 0) {
         iceLexerProcessSymbol(self);
