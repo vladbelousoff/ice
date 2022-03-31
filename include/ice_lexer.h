@@ -44,7 +44,7 @@ iceGetSymbol(iceLexerT* self)
 }
 
 static int
-iceIsNewline(char symbol)
+iceIsEndOfLine(char symbol)
 {
     return symbol == '\n';
 }
@@ -53,7 +53,7 @@ static char
 iceEatSymbol(iceLexerT* self)
 {
     char symbol = self->source[self->sPos++];
-    if (iceIsNewline(symbol)) {
+    if (iceIsEndOfLine(symbol)) {
         self->lPos = 0;
         self->line++;
     } else {
@@ -74,6 +74,12 @@ typedef enum iceSymbolT {
 } iceSymbolT;
 
 static int
+iceIsEndOfStream(char symbol)
+{
+    return symbol == 0;
+}
+
+static int
 iceIsSpace(char symbol)
 {
     return symbol == ' ';
@@ -82,7 +88,7 @@ iceIsSpace(char symbol)
 static int
 iceIsWhitespace(char symbol)
 {
-	return iceIsSpace(symbol) || symbol == '\t' || symbol == '\r';
+	return iceIsSpace(symbol) || iceIsEndOfLine(symbol) || symbol == '\t' || symbol == '\r';
 }
 
 static int
@@ -112,7 +118,7 @@ iceIsServiceSymbol(char symbol)
 static iceSymbolT
 iceGetSymbolType(char symbol)
 {
-    if (iceIsNewline(symbol))
+    if (iceIsEndOfLine(symbol))
         return ICE_SYMBOL_NEWLINE;
 
 	if (iceIsWhitespace(symbol))
@@ -150,7 +156,7 @@ iceLexerProcessDigit(iceLexerT* self)
             break;
         }
 
-        if (iceIsNewline(symbol)) {
+        if (iceIsEndOfLine(symbol)) {
             bufPos++;
             break;
         }
@@ -182,7 +188,7 @@ iceLexerProcessDigit(iceLexerT* self)
             continue;
         }
 
-        if (symbol == 0) {
+        if (iceIsEndOfStream(symbol)) {
             bufPos++;
             break;
         }
@@ -229,7 +235,7 @@ iceLexerProcessIdentifier(iceLexerT* self)
             break;
         }
 
-        if (symbol == 0) {
+        if (iceIsEndOfStream(symbol)) {
             bufPos++;
             break;
         }
@@ -270,7 +276,7 @@ iceLexerProcessString(iceLexerT* self)
             break;
         }
 
-        if (symbol == 0) {
+        if (iceIsEndOfStream(symbol)) {
             return -1;
         }
 
