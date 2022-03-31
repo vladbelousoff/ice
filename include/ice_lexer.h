@@ -76,7 +76,13 @@ typedef enum iceSymbolT {
 static int
 iceIsSpace(char symbol)
 {
-	return symbol == ' ' || symbol == '\t' || symbol == '\r';
+    return symbol == ' ';
+}
+
+static int
+iceIsWhitespace(char symbol)
+{
+	return iceIsSpace(symbol) || symbol == '\t' || symbol == '\r';
 }
 
 static int
@@ -109,7 +115,7 @@ iceGetSymbolType(char symbol)
     if (iceIsNewline(symbol))
         return ICE_SYMBOL_NEWLINE;
 
-	if (iceIsSpace(symbol))
+	if (iceIsWhitespace(symbol))
 		return ICE_SYMBOL_SPACE;
 
     if (iceIsDigit(symbol))
@@ -139,7 +145,7 @@ iceLexerProcessDigit(iceLexerT* self)
     for (;; iceEatSymbol(self)) {
         char symbol = iceGetSymbol(self);
 
-        if (iceIsSpace(symbol)) {
+        if (iceIsWhitespace(symbol)) {
             bufPos++;
             break;
         }
@@ -218,7 +224,7 @@ iceLexerProcessIdentifier(iceLexerT* self)
             continue;
         }
 
-        if (iceIsSpace(symbol)) {
+        if (iceIsWhitespace(symbol)) {
             bufPos++;
             break;
         }
