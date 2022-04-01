@@ -30,7 +30,8 @@ static char* iceTokens[] = {
    "",
    "",
    "",
-   0};
+   0,
+};
 
 typedef struct iceTokenT {
    iceListEntryT link;
