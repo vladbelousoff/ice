@@ -315,3 +315,29 @@ iceLexerTokenize(iceLexerT* self) {
       iceLexerProcessSymbol(self);
    }
 }
+
+static iceTokenT*
+iceLexerOne(iceLexerT* lexer, iceTokenIdT ids[], int count) {
+   iceListEntryT* entry;
+   iceListEntryT* safe;
+
+   iceListForEachSafe(entry, safe, &lexer->tokens) {
+      iceTokenT* token = iceListRecord(entry, iceTokenT, link);
+
+      //printf(">> Token Type %d\n", token->id);
+      //printf(">> Token %s\n\n", token->buf);
+
+      for (int i = 0; i < count; ++i) {
+         if (token->id != ids[i]) {
+            continue;
+         }
+
+         iceListRemove(entry);
+         return token;
+      }
+
+      break;
+   }
+
+   return NULL;
+}

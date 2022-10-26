@@ -24,8 +24,8 @@ iceListInit(iceListHeadT* self) {
 
 static void
 iceListTerm(iceListHeadT* self) {
-   self->prev = (iceListEntryT*)0xdeadbeef;
-   self->next = (iceListEntryT*)0xdeadbeef;
+   self->prev = (iceListEntryT*)NULL;
+   self->next = (iceListEntryT*)NULL;
 }
 
 static int
@@ -49,6 +49,16 @@ iceListPushFront(iceListHeadT* head, iceListEntryT* entry) {
 static void
 iceListPushBack(iceListHeadT* head, iceListEntryT* entry) {
    iceListAddInternal(entry, head->prev, (iceListEntryT*)head);
+}
+
+static iceListEntryT*
+iceListGetFront(iceListHeadT* head) {
+	iceListEntryT* entry = head->next;
+	if (entry != head) {
+		return entry;
+	}
+
+	return NULL;
 }
 
 static void

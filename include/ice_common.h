@@ -6,6 +6,8 @@
 
 #define ICE_ID_MAX_LEN 32
 
+#define iceCountOf(arr) (sizeof(arr) / sizeof((arr)[0]))
+
 static int
 iceFindSymbol(const char* source, char symbol) {
    const char* pSymbol = strchr(source, symbol);
