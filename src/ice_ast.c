@@ -171,3 +171,47 @@ iceAstFactor(iceLexerT* lexer) {
 
    return factor;
 }
+
+iceAstExprT* iceAstExpr(iceLexerT* lexer) {
+   iceAstExprT* factor = iceAstFactor(lexer);
+   if (factor == NULL) {
+      return NULL;
+   }
+
+   iceTokenIdT args[] = {
+      ICE_TOKEN_ID_ADD,
+      ICE_TOKEN_ID_SUB,
+   };
+
+   iceTokenT* op = iceLexerOne(lexer, args, iceCountOf(args));
+   if (op == NULL) {
+      return factor;
+   }
+
+   iceAstExprT* rFactor = iceAstFactor(lexer);
+   assert(rFactor != NULL);
+
+   iceAstBinOpT* binOp = iceMemInit(sizeof(*binOp));
+
+   switch (op->id) {
+      case ICE_TOKEN_ID_ADD:
+         binOp->type = ICE_AST_BIN_OP_TYPE_ADD;
+         break;
+      case ICE_TOKEN_ID_SUB:
+         binOp->type = ICE_AST_BIN_OP_TYPE_SUB;
+         break;
+      default:
+         assert(0 && "Unknown operator!");
+   }
+
+   iceMemTerm(op);
+
+   binOp->lhs = factor;
+   binOp->rhs = rFactor;
+
+   iceAstExprT* expr = iceMemInit(sizeof(*factor));
+   expr->type = ICE_AST_EXPR_TYPE_BINARY_OPERATOR;
+   expr->binOp = binOp;
+
+   return expr;
+}

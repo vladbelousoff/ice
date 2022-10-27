@@ -66,3 +66,4 @@ iceAstIdentT* iceAstIdent(iceLexerT* lexer);
 iceAstExprT* iceAstTerm(iceLexerT* lexer);
 iceAstExprT* iceAstParenExpr(iceLexerT* lexer);
 iceAstExprT* iceAstFactor(iceLexerT* lexer);
+iceAstExprT* iceAstExpr(iceLexerT* lexer);

@@ -298,6 +298,12 @@ iceLexerProcessOperator(iceLexerT* self) {
       case '%':
          tokenId = ICE_TOKEN_ID_MOD;
          break;
+      case '+':
+         tokenId = ICE_TOKEN_ID_ADD;
+         break;
+      case '-':
+         tokenId = ICE_TOKEN_ID_SUB;
+         break;
       default:
          return -1;
    }
