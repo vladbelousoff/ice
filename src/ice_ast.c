@@ -136,8 +136,8 @@ iceAstFactor(iceLexerT* lexer) {
       ICE_TOKEN_ID_MOD,
    };
 
-   iceTokenT* operator= iceLexerOne(lexer, args, iceCountOf(args));
-   if (operator== NULL) {
+   iceTokenT* op = iceLexerOne(lexer, args, iceCountOf(args));
+   if (op == NULL) {
       return term;
    }
 
@@ -146,7 +146,7 @@ iceAstFactor(iceLexerT* lexer) {
 
    iceAstBinOpT* binOp = iceMemInit(sizeof(*binOp));
 
-   switch (operator->id) {
+   switch (op->id) {
       case ICE_TOKEN_ID_MUL:
          binOp->type = ICE_AST_BIN_OP_TYPE_MUL;
          break;
@@ -160,7 +160,7 @@ iceAstFactor(iceLexerT* lexer) {
          assert(0 && "Unknown operator!");
    }
 
-   iceMemTerm(operator);
+   iceMemTerm(op);
 
    binOp->lhs = term;
    binOp->rhs = rTerm;
