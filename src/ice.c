@@ -12,6 +12,8 @@ int main(int argc, char* argv[]) {
    iceAstExprT* expr = iceAstFactor(&lexer);
    if (expr != NULL) {
       printf("EXPR %d\n", expr->type);
+      printf("EXPR %d\n", expr->binOp->lhs->lit->i32);
+      printf("EXPR %d\n", expr->binOp->rhs->lit->i32);
       iceMemTerm(expr);
    }
 
