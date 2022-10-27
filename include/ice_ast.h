@@ -20,68 +20,9 @@ typedef struct iceAstLitT {
    };
 } iceAstLitT;
 
-static iceAstLitT*
-iceAstLit(iceLexerT* lexer) {
-   iceTokenIdT args[] = {
-      ICE_TOKEN_ID_INTEGER,
-      ICE_TOKEN_ID_REAL,
-      ICE_TOKEN_ID_STRING,
-   };
-
-   iceTokenT* token = iceLexerOne(lexer, args, iceCountOf(args));
-   if (token == NULL) {
-      return NULL;
-   }
-
-   iceAstLitT* lit;
-   char* endPtr;
-
-   switch (token->id) {
-      case ICE_TOKEN_ID_INTEGER:
-         lit = iceMemInit(sizeof(*lit));
-         lit->type = ICE_AST_LIT_TYPE_I32;
-         lit->i32 = (int)strtol(token->buf, &endPtr, 10);
-         break;
-      case ICE_TOKEN_ID_REAL:
-         lit = iceMemInit(sizeof(*lit));
-         lit->type = ICE_AST_LIT_TYPE_F32;
-         lit->f32 = strtof(token->buf, &endPtr);
-         break;
-      case ICE_TOKEN_ID_STRING:
-         lit = iceMemInit(sizeof(*lit));
-         lit->type = ICE_AST_LIT_TYPE_STRING;
-         lit->string = strdup(token->buf);
-         break;
-      default:
-         iceMemTerm(token);
-         return NULL;
-   }
-
-   iceMemTerm(token);
-   return lit;
-}
-
 typedef struct iceAstIdentT {
    char* val;
 } iceAstIdentT;
-
-static iceAstIdentT*
-iceAstIdent(iceLexerT* lexer) {
-   iceTokenIdT args[] = {
-      ICE_TOKEN_ID_IDENTIFIER,
-   };
-
-   iceTokenT* token = iceLexerOne(lexer, args, iceCountOf(args));
-   if (token == NULL) {
-      return NULL;
-   }
-
-   iceAstIdentT* ident = iceMemInit(sizeof(*ident));
-   ident->val = strdup(token->buf);
-
-   iceMemTerm(token);
-   return ident;
-}
 
 typedef enum iceAstExprTypeT {
    ICE_AST_EXPR_TYPE_LITERAL,
@@ -98,5 +39,7 @@ typedef struct iceAstExprT {
    };
 } iceAstExprT;
 
+iceAstLitT* iceAstLit(iceLexerT* lexer);
+iceAstIdentT* iceAstIdent(iceLexerT* lexer);
 iceAstExprT* iceAstTerm(iceLexerT* lexer);
 iceAstExprT* iceAstParenExpr(iceLexerT* lexer);
