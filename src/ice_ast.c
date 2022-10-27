@@ -122,3 +122,52 @@ iceAstTerm(iceLexerT* lexer) {
 
    return NULL;
 }
+
+iceAstExprT*
+iceAstFactor(iceLexerT* lexer) {
+   iceAstExprT* term = iceAstTerm(lexer);
+   if (term == NULL) {
+      return NULL;
+   }
+
+   iceTokenIdT args[] = {
+      ICE_TOKEN_ID_MUL,
+      ICE_TOKEN_ID_DIV,
+      ICE_TOKEN_ID_MOD,
+   };
+
+   iceTokenT* operator= iceLexerOne(lexer, args, iceCountOf(args));
+   if (operator== NULL) {
+      return term;
+   }
+
+   iceAstExprT* rTerm = iceAstTerm(lexer);
+   assert(rTerm != NULL);
+
+   iceAstBinOpT* binOp = iceMemInit(sizeof(*binOp));
+
+   switch (operator->id) {
+      case ICE_TOKEN_ID_MUL:
+         binOp->type = ICE_AST_BIN_OP_TYPE_MUL;
+         break;
+      case ICE_TOKEN_ID_DIV:
+         binOp->type = ICE_AST_BIN_OP_TYPE_DIV;
+         break;
+      case ICE_TOKEN_ID_MOD:
+         binOp->type = ICE_AST_BIN_OP_TYPE_MOD;
+         break;
+      default:
+         assert(0 && "Unknown operator!");
+   }
+
+   iceMemTerm(operator);
+
+   binOp->lhs = term;
+   binOp->rhs = rTerm;
+
+   iceAstExprT* factor = iceMemInit(sizeof(*factor));
+   factor->type = ICE_AST_EXPR_TYPE_BINARY_OPERATOR;
+   factor->binOp = binOp;
+
+   return factor;
+}

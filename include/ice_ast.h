@@ -24,10 +24,31 @@ typedef struct iceAstIdentT {
    char* val;
 } iceAstIdentT;
 
+typedef enum iceAstBinOpTypeT {
+   ICE_AST_BIN_OP_TYPE_EQUAL,
+   ICE_AST_BIN_OP_TYPE_NOT_EQUAL,
+   ICE_AST_BIN_OP_TYPE_ADD,
+   ICE_AST_BIN_OP_TYPE_SUB,
+   ICE_AST_BIN_OP_TYPE_MUL,
+   ICE_AST_BIN_OP_TYPE_DIV,
+   ICE_AST_BIN_OP_TYPE_MOD,
+} iceAstBinOpTypeT;
+
+struct iceAstExprT;
+
+typedef struct iceAstBinOpT {
+   iceAstBinOpTypeT type;
+   struct iceAstExprT* lhs;
+   struct iceAstExprT* rhs;
+} iceAstBinOpT;
+
 typedef enum iceAstExprTypeT {
    ICE_AST_EXPR_TYPE_LITERAL,
    ICE_AST_EXPR_TYPE_IDENT,
    ICE_AST_EXPR_TYPE_PAREN_EXPR,
+   ICE_AST_EXPR_TYPE_BINARY_OPERATOR,
+   ICE_AST_EXPR_TYPE_FUNCTION_CALL,
+   ICE_AST_EXPR_TYPE_NEW,
 } iceAstExprTypeT;
 
 typedef struct iceAstExprT {
@@ -36,6 +57,7 @@ typedef struct iceAstExprT {
       iceAstLitT* lit;
       struct iceAstExprT* parenExpr;
       iceAstIdentT* ident;
+      iceAstBinOpT* binOp;
    };
 } iceAstExprT;
 
@@ -43,3 +65,4 @@ iceAstLitT* iceAstLit(iceLexerT* lexer);
 iceAstIdentT* iceAstIdent(iceLexerT* lexer);
 iceAstExprT* iceAstTerm(iceLexerT* lexer);
 iceAstExprT* iceAstParenExpr(iceLexerT* lexer);
+iceAstExprT* iceAstFactor(iceLexerT* lexer);

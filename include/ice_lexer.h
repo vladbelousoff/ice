@@ -100,7 +100,7 @@ iceIsQuote(char symbol) {
 
 static int
 iceIsServiceSymbol(char symbol) {
-   return iceFindSymbol("~!@#$%^&*()-+=", symbol) != -1;
+   return iceFindSymbol("~!@#$%^&*/%()-+=", symbol) != -1;
 }
 
 static iceSymbolT
@@ -284,6 +284,40 @@ iceLexerProcessString(iceLexerT* self) {
 }
 
 static int
+iceLexerProcessOperator(iceLexerT* self) {
+   iceTokenIdT tokenId;
+
+   char symbol = iceEatSymbol(self);
+   switch (symbol) {
+      case '*':
+         tokenId = ICE_TOKEN_ID_MUL;
+         break;
+      case '/':
+         tokenId = ICE_TOKEN_ID_DIV;
+         break;
+      case '%':
+         tokenId = ICE_TOKEN_ID_MOD;
+         break;
+      default:
+         return -1;
+   }
+
+   iceTokenT* token = iceMemInit(sizeof(*token));
+   if (token) {
+      token->id = tokenId;
+      token->bufSize = 0;
+      token->sPos = self->sPos;
+      token->lPos = self->lPos;
+      token->line = self->line;
+
+      iceListPushBack(&self->tokens, &token->link);
+      return 0;
+   }
+
+   return -1;
+}
+
+static int
 iceLexerProcessSymbol(iceLexerT* self) {
    iceSymbolT symbolType = iceGetSymbolType(iceGetSymbol(self));
    switch (symbolType) {
@@ -297,7 +331,7 @@ iceLexerProcessSymbol(iceLexerT* self) {
       case ICE_SYMBOL_QUOTE:
          return iceLexerProcessString(self);
       case ICE_SYMBOL_SERVICE:
-         return -1;
+         return iceLexerProcessOperator(self);
       case ICE_SYMBOL_SPACE:
       case ICE_SYMBOL_NEWLINE:
          iceEatSymbol(self);

@@ -15,6 +15,9 @@ typedef enum iceTokenIdT {
    ICE_TOKEN_ID_INTEGER,   // 9
    ICE_TOKEN_ID_REAL,      // 10
    ICE_TOKEN_ID_STRING,    // 11
+   ICE_TOKEN_ID_MUL,       // 11
+   ICE_TOKEN_ID_DIV,       // 11
+   ICE_TOKEN_ID_MOD,       // 11
 } iceTokenIdT;
 
 static char* iceTokens[] = {
@@ -30,6 +33,9 @@ static char* iceTokens[] = {
    "",
    "",
    "",
+   "*",
+   "/",
+   "%",
    0,
 };
 
