@@ -78,7 +78,7 @@ iceAstParenExpr(iceLexerT* lexer) {
 
    iceMemTerm(token);
 
-   iceAstExprT* expr = iceAstTerm(lexer);
+   iceAstExprT* expr = iceAstExpr(lexer);
    if (expr == NULL) {
       return NULL;
    }
@@ -106,10 +106,7 @@ iceAstTerm(iceLexerT* lexer) {
 
    iceAstExprT* parenExpr = iceAstParenExpr(lexer);
    if (parenExpr != NULL) {
-      iceAstExprT* expr = iceMemInit(sizeof(*expr));
-      expr->type = ICE_AST_EXPR_TYPE_PAREN_EXPR;
-      expr->parenExpr = parenExpr;
-      return expr;
+      return parenExpr;
    }
 
    iceAstIdentT* ident = iceAstIdent(lexer);

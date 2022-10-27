@@ -178,6 +178,8 @@ iceLexerProcessDigit(iceLexerT* self) {
          bufPos++;
          break;
       }
+
+      break;
    }
 
    iceTokenT* token = iceMemInit(sizeof(*token) + bufPos);
@@ -304,6 +306,12 @@ iceLexerProcessOperator(iceLexerT* self) {
       case '-':
          tokenId = ICE_TOKEN_ID_SUB;
          break;
+      case '(':
+         tokenId = ICE_TOKEN_ID_LPAREN;
+         break;
+      case ')':
+         tokenId = ICE_TOKEN_ID_RPAREN;
+         break;
       default:
          return -1;
    }
@@ -364,13 +372,12 @@ iceLexerOne(iceLexerT* lexer, iceTokenIdT ids[], int count) {
    iceListForEachSafe(entry, safe, &lexer->tokens) {
       iceTokenT* token = iceListRecord(entry, iceTokenT, link);
 
-      //printf(">> Token Type %d\n", token->id);
-      //printf(">> Token %s\n\n", token->buf);
-
       for (int i = 0; i < count; ++i) {
          if (token->id != ids[i]) {
             continue;
          }
+
+         printf(">> Token id:\t%-3d\tname: %s\n", token->id, iceTokens[token->id]);
 
          iceListRemove(entry);
          return token;

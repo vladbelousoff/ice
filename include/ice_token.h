@@ -23,7 +23,7 @@ typedef enum iceTokenIdT {
 } iceTokenIdT;
 
 static char* iceTokens[] = {
-   "",
+   "<unknown>",
    "function",
    "{",
    "}",
@@ -31,10 +31,10 @@ static char* iceTokens[] = {
    ")",
    "[",
    "]",
-   "",
-   "",
-   "",
-   "",
+   "<ident>",
+   "<integer>",
+   "<real>",
+   "<string>",
    "*",
    "/",
    "%",
