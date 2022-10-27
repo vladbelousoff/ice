@@ -30,7 +30,7 @@ iceAstLit(iceLexerT* lexer) {
       case ICE_TOKEN_ID_STRING:
          lit = iceMemInit(sizeof(*lit));
          lit->type = ICE_AST_LIT_TYPE_STRING;
-         lit->string = strdup(token->buf);
+         lit->string = _strdup(token->buf);
          break;
       default:
          iceMemTerm(token);
@@ -53,7 +53,7 @@ iceAstIdent(iceLexerT* lexer) {
    }
 
    iceAstIdentT* ident = iceMemInit(sizeof(*ident));
-   ident->val = strdup(token->buf);
+   ident->val = _strdup(token->buf);
 
    iceMemTerm(token);
    return ident;
