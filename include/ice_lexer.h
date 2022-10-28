@@ -17,7 +17,7 @@ static void
 iceLexerInit(iceLexerT* self, const char source[]) {
    iceListInit(&self->tokens);
 
-   self->source = source;
+   self->source = _strdup(source);
    self->line = 1;
    self->sPos = 0;
    self->lPos = 0;
@@ -33,6 +33,8 @@ iceLexerTerm(iceLexerT* self) {
       iceListRemove(entry);
       iceMemTerm(token);
    }
+
+   free((void*)self->source);
 }
 
 static char
