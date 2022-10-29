@@ -381,7 +381,7 @@ iceLexerGetAnyOf(iceLexerT* lexer, iceTokenIdT ids[], int count) {
             continue;
          }
 
-         printf(">> Token id:\t%-3d\tname: %s\n", token->id, iceTokens[token->id]);
+         // printf(">> Token id:\t%-3d\t name: %s\n", token->id, iceTokens[token->id]);
 
          iceListRemove(entry);
          return token;
@@ -389,6 +389,8 @@ iceLexerGetAnyOf(iceLexerT* lexer, iceTokenIdT ids[], int count) {
 
       break;
    }
+
+   (void) safe;
 
    return NULL;
 }
