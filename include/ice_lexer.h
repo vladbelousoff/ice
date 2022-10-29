@@ -229,7 +229,8 @@ iceLexerProcessIdentifier(iceLexerT* self) {
          break;
       }
 
-      return -1;
+      bufPos++;
+      break;
    }
 
    iceTokenT* token = iceMemInit(sizeof(*token) + bufPos);
@@ -335,7 +336,8 @@ iceLexerProcessOperator(iceLexerT* self) {
 
 static int
 iceLexerProcessSymbol(iceLexerT* self) {
-   iceSymbolT symbolType = iceGetSymbolType(iceGetSymbol(self));
+   char symbol = iceGetSymbol(self);
+   iceSymbolT symbolType = iceGetSymbolType(symbol);
    switch (symbolType) {
       case ICE_SYMBOL_UNKNOWN:
          iceLogE("Unknown symbol '%c' line: %d", iceGetSymbol(self), (int)self->line);
@@ -367,7 +369,7 @@ iceLexerTokenize(iceLexerT* self) {
 }
 
 static iceTokenT*
-iceLexerOne(iceLexerT* lexer, iceTokenIdT ids[], int count) {
+iceLexerGetAnyOf(iceLexerT* lexer, iceTokenIdT ids[], int count) {
    iceListEntryT* entry;
    iceListEntryT* safe;
 
@@ -389,4 +391,11 @@ iceLexerOne(iceLexerT* lexer, iceTokenIdT ids[], int count) {
    }
 
    return NULL;
+}
+
+static iceTokenT*
+iceLexerGetExact(iceLexerT* lexer, iceTokenIdT id)
+{
+   iceTokenIdT args[] = {id};
+   return iceLexerGetAnyOf(lexer, args, 1);
 }

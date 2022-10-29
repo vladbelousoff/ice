@@ -8,7 +8,7 @@ iceAstLit(iceLexerT* lexer) {
       ICE_TOKEN_ID_STRING,
    };
 
-   iceTokenT* token = iceLexerOne(lexer, args, iceCountOf(args));
+   iceTokenT* token = iceLexerGetAnyOf(lexer, args, iceCountOf(args));
    if (token == NULL) {
       return NULL;
    }
@@ -43,11 +43,7 @@ iceAstLit(iceLexerT* lexer) {
 
 iceAstIdentT*
 iceAstIdent(iceLexerT* lexer) {
-   iceTokenIdT args[] = {
-      ICE_TOKEN_ID_IDENTIFIER,
-   };
-
-   iceTokenT* token = iceLexerOne(lexer, args, iceCountOf(args));
+   iceTokenT* token = iceLexerGetExact(lexer, ICE_TOKEN_ID_IDENTIFIER);
    if (token == NULL) {
       return NULL;
    }
@@ -61,17 +57,9 @@ iceAstIdent(iceLexerT* lexer) {
 
 iceAstExprT*
 iceAstParenExpr(iceLexerT* lexer) {
-   iceTokenIdT args1[] = {
-      ICE_TOKEN_ID_LPAREN,
-   };
-
-   iceTokenIdT args2[] = {
-      ICE_TOKEN_ID_RPAREN,
-   };
-
    iceTokenT* token;
 
-   token = iceLexerOne(lexer, args1, iceCountOf(args1));
+   token = iceLexerGetExact(lexer, ICE_TOKEN_ID_LPAREN);
    if (token == NULL) {
       return NULL;
    }
@@ -83,7 +71,7 @@ iceAstParenExpr(iceLexerT* lexer) {
       return NULL;
    }
 
-   token = iceLexerOne(lexer, args2, iceCountOf(args2));
+   token = iceLexerGetExact(lexer, ICE_TOKEN_ID_RPAREN);
    if (token == NULL) {
       iceMemTerm(expr);
       return NULL;
@@ -122,9 +110,18 @@ iceAstTerm(iceLexerT* lexer) {
 
 iceAstExprT*
 iceAstFactor(iceLexerT* lexer) {
-   iceAstExprT* term = iceAstTerm(lexer);
-   if (term == NULL) {
+   iceAstExprT* lhs = iceAstTerm(lexer);
+   if (lhs == NULL) {
       return NULL;
+   }
+
+   if (lhs->type == ICE_AST_EXPR_TYPE_IDENT) {
+      iceAstFuncCallT* funcCall = iceAstFuncCall(lexer);
+      if (funcCall != NULL) {
+         funcCall->ident = lhs->ident;
+         lhs->type = ICE_AST_EXPR_TYPE_FUNCTION_CALL;
+         lhs->funcCall = funcCall;
+      }
    }
 
    iceTokenIdT args[] = {
@@ -133,13 +130,13 @@ iceAstFactor(iceLexerT* lexer) {
       ICE_TOKEN_ID_MOD,
    };
 
-   iceTokenT* op = iceLexerOne(lexer, args, iceCountOf(args));
+   iceTokenT* op = iceLexerGetAnyOf(lexer, args, iceCountOf(args));
    if (op == NULL) {
-      return term;
+      return lhs;
    }
 
-   iceAstExprT* rTerm = iceAstTerm(lexer);
-   assert(rTerm != NULL);
+   iceAstExprT* rhs = iceAstTerm(lexer);
+   assert(rhs != NULL);
 
    iceAstBinOpT* binOp = iceMemInit(sizeof(*binOp));
 
@@ -159,8 +156,8 @@ iceAstFactor(iceLexerT* lexer) {
 
    iceMemTerm(op);
 
-   binOp->lhs = term;
-   binOp->rhs = rTerm;
+   binOp->lhs = lhs;
+   binOp->rhs = rhs;
 
    iceAstExprT* factor = iceMemInit(sizeof(*factor));
    factor->type = ICE_AST_EXPR_TYPE_BINARY_OPERATOR;
@@ -170,8 +167,8 @@ iceAstFactor(iceLexerT* lexer) {
 }
 
 iceAstExprT* iceAstExpr(iceLexerT* lexer) {
-   iceAstExprT* factor = iceAstFactor(lexer);
-   if (factor == NULL) {
+   iceAstExprT* lhs = iceAstFactor(lexer);
+   if (lhs == NULL) {
       return NULL;
    }
 
@@ -180,13 +177,13 @@ iceAstExprT* iceAstExpr(iceLexerT* lexer) {
       ICE_TOKEN_ID_SUB,
    };
 
-   iceTokenT* op = iceLexerOne(lexer, args, iceCountOf(args));
+   iceTokenT* op = iceLexerGetAnyOf(lexer, args, iceCountOf(args));
    if (op == NULL) {
-      return factor;
+      return lhs;
    }
 
-   iceAstExprT* rFactor = iceAstFactor(lexer);
-   assert(rFactor != NULL);
+   iceAstExprT* rhs = iceAstFactor(lexer);
+   assert(rhs != NULL);
 
    iceAstBinOpT* binOp = iceMemInit(sizeof(*binOp));
 
@@ -203,12 +200,42 @@ iceAstExprT* iceAstExpr(iceLexerT* lexer) {
 
    iceMemTerm(op);
 
-   binOp->lhs = factor;
-   binOp->rhs = rFactor;
+   binOp->lhs = lhs;
+   binOp->rhs = rhs;
 
-   iceAstExprT* expr = iceMemInit(sizeof(*factor));
+   iceAstExprT* expr = iceMemInit(sizeof(*lhs));
    expr->type = ICE_AST_EXPR_TYPE_BINARY_OPERATOR;
    expr->binOp = binOp;
 
    return expr;
+}
+
+iceAstFuncCallT* iceAstFuncCall(iceLexerT* lexer) {
+   iceTokenT* token = iceLexerGetExact(lexer, ICE_TOKEN_ID_LPAREN);
+   if (token == NULL) {
+      return NULL;
+   }
+
+   iceAstFuncCallT* args = iceMemInit(sizeof(*args));
+   iceListInit(&args->args);
+
+   for (;;) {
+      token = iceLexerGetExact(lexer, ICE_TOKEN_ID_RPAREN);
+      if (token != NULL) {
+         iceMemTerm(token);
+         break;
+      }
+
+      iceMemTerm(token);
+
+      iceAstExprT* expr = iceAstExpr(lexer);
+      assert(expr != NULL && "This construction has to look like <FunctionName>(arg0, arg1, arg2,.. argN)");
+
+      iceAstFuncCallArgT* arg = iceMemInit(sizeof(*arg));
+      arg->expr = expr;
+
+      iceListPushBack(&args->args, &arg->link);
+   }
+
+   return args;
 }

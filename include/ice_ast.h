@@ -50,6 +50,8 @@ typedef enum iceAstExprTypeT {
    ICE_AST_EXPR_TYPE_NEW,
 } iceAstExprTypeT;
 
+struct iceAstFuncCallT;
+
 typedef struct iceAstExprT {
    iceAstExprTypeT type;
    union {
@@ -57,8 +59,19 @@ typedef struct iceAstExprT {
       struct iceAstExprT* parenExpr;
       iceAstIdentT* ident;
       iceAstBinOpT* binOp;
+      struct iceAstFuncCallT* funcCall;
    };
 } iceAstExprT;
+
+typedef struct iceAstFuncCallT {
+   iceAstIdentT* ident;
+   iceListHeadT args;
+} iceAstFuncCallT;
+
+typedef struct iceAstFuncCallArgT {
+   iceListEntryT link;
+   iceAstExprT* expr;
+} iceAstFuncCallArgT;
 
 iceAstLitT* iceAstLit(iceLexerT* lexer);
 iceAstIdentT* iceAstIdent(iceLexerT* lexer);
@@ -66,3 +79,4 @@ iceAstExprT* iceAstTerm(iceLexerT* lexer);
 iceAstExprT* iceAstParenExpr(iceLexerT* lexer);
 iceAstExprT* iceAstFactor(iceLexerT* lexer);
 iceAstExprT* iceAstExpr(iceLexerT* lexer);
+iceAstFuncCallT* iceAstFuncCall(iceLexerT* lexer);
