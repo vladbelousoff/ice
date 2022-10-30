@@ -33,6 +33,7 @@ iceTestParser(const MunitParameter params[], void* data) {
    if (expr != NULL) {
       munit_assert_int(expr->type, ==, ICE_AST_EXPR_TYPE_BINARY_OPERATOR);
       munit_assert_int(expr->binOp->lhs->type, ==, ICE_AST_EXPR_TYPE_FUNCTION_CALL);
+      munit_assert_string_equal(expr->binOp->lhs->funcCall->ident->val, "call");
       munit_assert_int(iceListRecord(expr->binOp->lhs->funcCall->args.next, iceAstFuncCallArgT, link)->expr->lit->i32, ==, 11);
       munit_assert_int(expr->binOp->rhs->type, ==, ICE_AST_EXPR_TYPE_BINARY_OPERATOR);
       munit_assert_float(expr->binOp->rhs->binOp->lhs->lit->f32, ==, 3.2f);
