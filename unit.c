@@ -9,27 +9,46 @@ iceTestParserInit(const MunitParameter params[], void* data) {
    (void) params;
    (void) data;
 
-   iceLexerT* lexer = iceMemInit(sizeof(*lexer));
-   return (void*)lexer;
+   return NULL;
 }
 
 static void
 iceTestParserTerm(void* data) {
-   iceLexerT* lexer = (iceLexerT*)data;
-   iceLexerTerm(lexer);
-   iceMemTerm(data);
+   (void) data;
 }
 
 static MunitResult
-iceTestParser(const MunitParameter params[], void* data) {
-   static const char source[] = "call(11) * (3.2 - 2.4)";
+iceTestCompoundExpressionInsideFuncCall(const MunitParameter params[], void* data) {
    (void) params;
+   (void) data;
 
-   iceLexerT* lexer = (iceLexerT*)data;
-   iceLexerInit(lexer, source);
-   iceLexerTokenize(lexer);
+   static const char source[] = "functionCall(( (x) + ( y ) * 777 ))";
 
-   iceAstExprT* expr = iceAstExpr(lexer);
+   iceLexerT lexer;
+   iceLexerInit(&lexer, source);
+   iceLexerTokenize(&lexer);
+
+   iceAstExprT* expr = iceAstExpr(&lexer);
+   if (expr != NULL) {
+      iceMemTerm(expr);
+      return MUNIT_OK;
+   }
+
+   return MUNIT_FAIL;
+}
+
+static MunitResult
+iceTestPrettySimpleExpression(const MunitParameter params[], void* data) {
+   (void) params;
+   (void) data;
+
+   static const char source[] = "call(11) * (3.2 - 2.4)";
+
+   iceLexerT lexer;
+   iceLexerInit(&lexer, source);
+   iceLexerTokenize(&lexer);
+
+   iceAstExprT* expr = iceAstExpr(&lexer);
    if (expr != NULL) {
       munit_assert_int(expr->type, ==, ICE_AST_EXPR_TYPE_BINARY_OPERATOR);
       munit_assert_int(expr->binOp->lhs->type, ==, ICE_AST_EXPR_TYPE_FUNCTION_CALL);
@@ -47,8 +66,16 @@ iceTestParser(const MunitParameter params[], void* data) {
 
 static MunitTest cases[] = {
    {
-      "/parser",
-      iceTestParser,
+      "/parse_pretty_simple_expression",
+      iceTestPrettySimpleExpression,
+      iceTestParserInit,
+      iceTestParserTerm,
+      MUNIT_TEST_OPTION_NONE,
+      NULL,
+   },
+   {
+      "/parse_compound_expression_inside_function_call",
+      iceTestCompoundExpressionInsideFuncCall,
       iceTestParserInit,
       iceTestParserTerm,
       MUNIT_TEST_OPTION_NONE,

@@ -17,8 +17,8 @@
 
 #define iceLog printf
 
-#define __LogPrint(lvl, file, line, func, fmt, ...) \
-   iceLog("[%s] %s:%-3u (%s)" fmt, lvl, file, line, func, ##__VA_ARGS__)
+#define LogPrint_(lvl, file, line, func, fmt, ...) \
+   iceLog("[%s] %s:%-3u (%s) " fmt, lvl, file, line, func, ##__VA_ARGS__)
 
 #if ICE_DEBUG_LEVEL >= 4
 #define iceLogI iceLog
@@ -30,7 +30,7 @@
 
 #if ICE_DEBUG_LEVEL >= 3
 #define iceLogD(_fmt, ...) \
-   __LogPrint("D", ICE_FILENAME, __LINE__, __FUNCTION__, _fmt, ##__VA_ARGS__)
+   LogPrint_("D", ICE_FILENAME, __LINE__, __FUNCTION__, _fmt, ##__VA_ARGS__)
 #else
 #define iceLogD(_fmt, ...) \
    do {                    \
@@ -39,7 +39,7 @@
 
 #if ICE_DEBUG_LEVEL >= 2
 #define iceLogW(_fmt, ...) \
-   __LogPrint("W", ICE_FILENAME, __LINE__, __FUNCTION__, _fmt, ##__VA_ARGS__)
+   LogPrint_("W", ICE_FILENAME, __LINE__, __FUNCTION__, _fmt, ##__VA_ARGS__)
 #else
 #define iceLogW(_fmt, ...) \
    do {                    \
@@ -48,7 +48,7 @@
 
 #if ICE_DEBUG_LEVEL >= 1
 #define iceLogE(_fmt, ...) \
-   __LogPrint("E", ICE_FILENAME, __LINE__, __FUNCTION__, _fmt, ##__VA_ARGS__)
+   LogPrint_("E", ICE_FILENAME, __LINE__, __FUNCTION__, _fmt, ##__VA_ARGS__)
 #else
 #define iceLogE(_fmt, ...) \
    do {                    \

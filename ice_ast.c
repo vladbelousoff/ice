@@ -229,7 +229,7 @@ iceAstFuncCallT* iceAstFuncCall(iceLexerT* lexer) {
       iceMemTerm(token);
 
       iceAstExprT* expr = iceAstExpr(lexer);
-      assert(expr != NULL && "This construction has to look like <FunctionName>(arg0, arg1, arg2,.. argN)");
+      assert(expr != NULL);
 
       iceAstFuncCallArgT* arg = iceMemInit(sizeof(*arg));
       arg->expr = expr;
