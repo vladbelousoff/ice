@@ -1,26 +1,26 @@
-#include "munit/munit.h"
 #include "ice_ast.h"
+#include "munit/munit.h"
 
 //static const char source[] = "function main() : int { log.debug('Hello World!'); return 0; }";
 //static const char source[] = "variable 100 \n300.1  200  123.75 'Hello'\t_World 'Hello World' 56.";
 
 static void*
 iceTestParserInit(const MunitParameter params[], void* data) {
-   (void) params;
-   (void) data;
+   (void)params;
+   (void)data;
 
    return NULL;
 }
 
 static void
 iceTestParserTerm(void* data) {
-   (void) data;
+   (void)data;
 }
 
 static MunitResult
 iceTestCompoundExpressionInsideFuncCall(const MunitParameter params[], void* data) {
-   (void) params;
-   (void) data;
+   (void)params;
+   (void)data;
 
    static const char source[] = "functionCall(( (x) + ( y ) * 777 ))";
 
@@ -38,9 +38,50 @@ iceTestCompoundExpressionInsideFuncCall(const MunitParameter params[], void* dat
 }
 
 static MunitResult
+iceTestCompoundExpressionWithManyBinaryOperators(const MunitParameter params[], void* data) {
+   (void)params;
+   (void)data;
+
+   static const char source[] = "functionCall(( (x) + ( y ) * 777 - 1000 * ( 5 - 6 ) - 7 + 8 * 999 ))";
+
+   iceLexerT lexer;
+   iceLexerInit(&lexer, source);
+   iceLexerTokenize(&lexer);
+
+   iceAstExprT* expr = iceAstExpr(&lexer);
+   if (expr != NULL) {
+      munit_assert_int(expr->type, ==, ICE_AST_EXPR_TYPE_FUNCTION_CALL);
+      iceAstFuncCallT* funcCall = expr->funcCall;
+      munit_assert_not_null(funcCall);
+
+      iceAstFuncCallArgT* arg = iceListRecord(funcCall->args.next, iceAstFuncCallArgT, link);
+      iceAstExprT* exprArg = arg->expr;
+
+      munit_assert_int(exprArg->type, ==, ICE_AST_EXPR_TYPE_BINARY_OPERATOR);
+      iceAstBinOpT* expr7add8mul999 = exprArg->binOp;
+
+      munit_assert_int(expr7add8mul999->type, ==, ICE_AST_EXPR_TYPE_BINARY_OPERATOR);
+
+      munit_assert_int(expr7add8mul999->rhs->type, ==, ICE_AST_EXPR_TYPE_BINARY_OPERATOR);
+      iceAstBinOpT* expr8mul999 = expr7add8mul999->rhs->binOp;
+
+      //munit_assert_int(expr7add8mul999->lhs->type, ==, ICE_AST_EXPR_TYPE_BINARY_OPERATOR);
+      //iceAstBinOpT* expr7add8mul999lhs = expr7add8mul999->lhs->binOp;
+
+      munit_assert_int(expr8mul999->lhs->lit->i32, ==, 8);
+      munit_assert_int(expr8mul999->rhs->lit->i32, ==, 999);
+
+      iceMemTerm(expr);
+      return MUNIT_OK;
+   }
+
+   return MUNIT_FAIL;
+}
+
+static MunitResult
 iceTestPrettySimpleExpression(const MunitParameter params[], void* data) {
-   (void) params;
-   (void) data;
+   (void)params;
+   (void)data;
 
    static const char source[] = "call(11) * (3.2 - 2.4)";
 
@@ -66,7 +107,7 @@ iceTestPrettySimpleExpression(const MunitParameter params[], void* data) {
 
 static MunitTest cases[] = {
    {
-      "/parse_pretty_simple_expression",
+      "/parse_1",
       iceTestPrettySimpleExpression,
       iceTestParserInit,
       iceTestParserTerm,
@@ -74,15 +115,24 @@ static MunitTest cases[] = {
       NULL,
    },
    {
-      "/parse_compound_expression_inside_function_call",
+      "/parse_2",
       iceTestCompoundExpressionInsideFuncCall,
       iceTestParserInit,
       iceTestParserTerm,
       MUNIT_TEST_OPTION_NONE,
       NULL,
    },
-   { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
-};
+#if 0
+   {
+      "/parse_3",
+      iceTestCompoundExpressionWithManyBinaryOperators,
+      iceTestParserInit,
+      iceTestParserTerm,
+      MUNIT_TEST_OPTION_NONE,
+      NULL,
+   },
+#endif
+   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}};
 
 static const MunitSuite suite = {
    "/ice",

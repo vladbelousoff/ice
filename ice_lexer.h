@@ -381,7 +381,7 @@ iceLexerGetAnyOf(iceLexerT* lexer, iceTokenIdT ids[], int count) {
             continue;
          }
 
-         // printf(">> Token id:\t%-3d\t name: %s\n", token->id, iceTokens[token->id]);
+         printf(">> Token id:\t%-3d\t name: %s\n", token->id, iceTokens[token->id]);
 
          iceListRemove(entry);
          return token;
@@ -390,14 +390,13 @@ iceLexerGetAnyOf(iceLexerT* lexer, iceTokenIdT ids[], int count) {
       break;
    }
 
-   (void) safe;
+   (void)safe;
 
    return NULL;
 }
 
 static iceTokenT*
-iceLexerGetExact(iceLexerT* lexer, iceTokenIdT id)
-{
+iceLexerGetExact(iceLexerT* lexer, iceTokenIdT id) {
    iceTokenIdT args[] = {id};
    return iceLexerGetAnyOf(lexer, args, 1);
 }

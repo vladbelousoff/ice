@@ -135,7 +135,7 @@ iceAstFactor(iceLexerT* lexer) {
       return lhs;
    }
 
-   iceAstExprT* rhs = iceAstTerm(lexer);
+   iceAstExprT* rhs = iceAstExpr(lexer);
    assert(rhs != NULL);
 
    iceAstBinOpT* binOp = iceMemInit(sizeof(*binOp));
@@ -203,7 +203,7 @@ iceAstExprT* iceAstExpr(iceLexerT* lexer) {
    binOp->lhs = lhs;
    binOp->rhs = rhs;
 
-   iceAstExprT* expr = iceMemInit(sizeof(*lhs));
+   iceAstExprT* expr = iceMemInit(sizeof(*expr));
    expr->type = ICE_AST_EXPR_TYPE_BINARY_OPERATOR;
    expr->binOp = binOp;
 
